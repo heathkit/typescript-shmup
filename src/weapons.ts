@@ -122,14 +122,13 @@ export class FrontAndBack extends Weapon {
   }
 }
 
-/*
 //////////////////////////////////////////////////////
 //  3-way Fire (directly above, below and in front) //
 //////////////////////////////////////////////////////
 
-Weapon.ThreeWay = function (game) {
-
-		Phaser.Group.call(this, game, game.world, 'Three Way', false, true, Phaser.Physics.ARCADE);
+export class ThreeWay extends Weapon {
+  constructor(game) {
+		super(game, 'Three Way');
 
 		this.nextFire = 0;
 		this.bulletSpeed = 600;
@@ -141,13 +140,9 @@ Weapon.ThreeWay = function (game) {
 		}
 
 		return this;
+  }
 
-};
-
-Weapon.ThreeWay.prototype = Object.create(Phaser.Group.prototype);
-Weapon.ThreeWay.prototype.constructor = Weapon.ThreeWay;
-
-Weapon.ThreeWay.prototype.fire = function (source) {
+fire(source) {
 
 		if (this.game.time.time < this.nextFire) { return; }
 
@@ -159,6 +154,7 @@ Weapon.ThreeWay.prototype.fire = function (source) {
 		this.getFirstExists(false).fire(x, y, 90, this.bulletSpeed, 0, 0);
 
 		this.nextFire = this.game.time.time + this.fireRate;
+};
 
 };
 
@@ -166,9 +162,9 @@ Weapon.ThreeWay.prototype.fire = function (source) {
 //  8-way fire, from all sides of the ship //
 /////////////////////////////////////////////
 
-Weapon.EightWay = function (game) {
-
-		Phaser.Group.call(this, game, game.world, 'Eight Way', false, true, Phaser.Physics.ARCADE);
+export class EightWay extends Weapon {
+  constructor(game) {
+		super(game, 'Eight Way');
 
 		this.nextFire = 0;
 		this.bulletSpeed = 600;
@@ -180,13 +176,9 @@ Weapon.EightWay = function (game) {
 		}
 
 		return this;
+  }
 
-};
-
-Weapon.EightWay.prototype = Object.create(Phaser.Group.prototype);
-Weapon.EightWay.prototype.constructor = Weapon.EightWay;
-
-Weapon.EightWay.prototype.fire = function (source) {
+fire(source) {
 
 		if (this.game.time.time < this.nextFire) { return; }
 
@@ -203,16 +195,17 @@ Weapon.EightWay.prototype.fire = function (source) {
 		this.getFirstExists(false).fire(x, y, 315, this.bulletSpeed, 0, 0);
 
 		this.nextFire = this.game.time.time + this.fireRate;
+}
 
-};
+}
 
 ////////////////////////////////////////////////////
 //  Bullets are fired out scattered on the y axis //
 ////////////////////////////////////////////////////
 
-Weapon.ScatterShot = function (game) {
-
-		Phaser.Group.call(this, game, game.world, 'Scatter Shot', false, true, Phaser.Physics.ARCADE);
+export class ScatterShot extends Weapon {
+  constructor(game) {
+		super(game, 'Scatter Shot');
 
 		this.nextFire = 0;
 		this.bulletSpeed = 600;
@@ -224,13 +217,9 @@ Weapon.ScatterShot = function (game) {
 		}
 
 		return this;
+  }
 
-};
-
-Weapon.ScatterShot.prototype = Object.create(Phaser.Group.prototype);
-Weapon.ScatterShot.prototype.constructor = Weapon.ScatterShot;
-
-Weapon.ScatterShot.prototype.fire = function (source) {
+fire(source) {
 
 		if (this.game.time.time < this.nextFire) { return; }
 
@@ -241,15 +230,16 @@ Weapon.ScatterShot.prototype.fire = function (source) {
 
 		this.nextFire = this.game.time.time + this.fireRate;
 
-};
+}
+}
 
 //////////////////////////////////////////////////////////////////////////
 //  Fires a streaming beam of lazers, very fast, in front of the player //
 //////////////////////////////////////////////////////////////////////////
 
-Weapon.Beam = function (game) {
-
-		Phaser.Group.call(this, game, game.world, 'Beam', false, true, Phaser.Physics.ARCADE);
+export class Beam extends Weapon {
+  constructor(game) {
+		super(game, 'Beam');
 
 		this.nextFire = 0;
 		this.bulletSpeed = 1000;
@@ -261,13 +251,9 @@ Weapon.Beam = function (game) {
 		}
 
 		return this;
+  }
 
-};
-
-Weapon.Beam.prototype = Object.create(Phaser.Group.prototype);
-Weapon.Beam.prototype.constructor = Weapon.Beam;
-
-Weapon.Beam.prototype.fire = function (source) {
+fire(source) {
 
 		if (this.game.time.time < this.nextFire) { return; }
 
@@ -277,9 +263,10 @@ Weapon.Beam.prototype.fire = function (source) {
 		this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0, 0);
 
 		this.nextFire = this.game.time.time + this.fireRate;
-
+}
 };
 
+/*
 ///////////////////////////////////////////////////////////////////////
 //  A three-way fire where the top and bottom bullets bend on a path //
 ///////////////////////////////////////////////////////////////////////
@@ -514,5 +501,4 @@ Weapon.Combo2.prototype.fire = function (source) {
 		this.weapon3.fire(source);
 
 };
-
 */

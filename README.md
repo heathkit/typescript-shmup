@@ -1,14 +1,17 @@
-# Phaser skeleton w/ TypeScript and WebPack
+# Typescript Shmup
 
-##About
+This is a port to TypeScript of [this shmup demo](http://www.photonstorm.com/tags/shmup).
 
-A simple example using Phaser with TypeScript and WebPack. Based on [lean/phaser-es6-webpack](https://github.com/lean/phaser-es6-webpack) and [the-simian/slush-phaser-webpack](https://github.com/the-simian/slush-phaser-webpack).
+## TODO
+- clang formatting
+- publishing to github pages
+- unit testing
 
 ##Setup
 
 ```sh
 npm install
-
+typings install
 webpack
 ```
 
