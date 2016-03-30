@@ -59,6 +59,8 @@ abstract class Weapon extends Phaser.Group {
   constructor(game, name) {
     super(game, game.world, name, false, true, Phaser.Physics.ARCADE);
   }
+
+  abstract fire(source: any);
 }
 
 ////////////////////////////////////////////////////
@@ -147,7 +149,6 @@ export class ThreeWay extends Weapon {
   }
 
   fire(source) {
-
     if (this.game.time.time < this.nextFire) {
       return;
     }
@@ -183,7 +184,6 @@ export class EightWay extends Weapon {
   }
 
   fire(source) {
-
     if (this.game.time.time < this.nextFire) {
       return;
     }
@@ -224,16 +224,13 @@ export class ScatterShot extends Weapon {
   }
 
   fire(source) {
-
     if (this.game.time.time < this.nextFire) {
       return;
     }
 
     var x = source.x + 16;
     var y = (source.y + source.height / 2) + this.game.rnd.between(-10, 10);
-
     this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0, 0);
-
     this.nextFire = this.game.time.time + this.fireRate;
   }
 }
@@ -258,7 +255,6 @@ export class Beam extends Weapon {
   }
 
   fire(source) {
-
     if (this.game.time.time < this.nextFire) {
       return;
     }
@@ -267,257 +263,228 @@ export class Beam extends Weapon {
     var y = source.y + 10;
 
     this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0, 0);
-
     this.nextFire = this.game.time.time + this.fireRate;
   }
-};
+}
 
-/*
 ///////////////////////////////////////////////////////////////////////
 //  A three-way fire where the top and bottom bullets bend on a path //
 ///////////////////////////////////////////////////////////////////////
 
-Weapon.SplitShot = function (game) {
+export class SplitShot extends Weapon {
+  constructor(game) {
+    super(game, 'Split Shot');
 
-                Phaser.Group.call(this, game, game.world, 'Split Shot', false,
-true, Phaser.Physics.ARCADE);
+    this.nextFire = 0;
+    this.bulletSpeed = 700;
+    this.fireRate = 40;
 
-                this.nextFire = 0;
-                this.bulletSpeed = 700;
-                this.fireRate = 40;
+    for (var i = 0; i < 64; i++) {
+      this.add(new Bullet(game, 'bullet8'), true);
+    }
 
-                for (var i = 0; i < 64; i++)
-                {
-                                this.add(new Bullet(game, 'bullet8'), true);
-                }
+    return this;
+  }
 
-                return this;
+  fire(source) {
+    if (this.game.time.time < this.nextFire) {
+      return;
+    }
 
-};
+    var x = source.x + 20;
+    var y = source.y + 10;
 
-Weapon.SplitShot.prototype = Object.create(Phaser.Group.prototype);
-Weapon.SplitShot.prototype.constructor = Weapon.SplitShot;
+    this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0, -500);
+    this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0, 0);
+    this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0, 500);
 
-Weapon.SplitShot.prototype.fire = function (source) {
-
-                if (this.game.time.time < this.nextFire) { return; }
-
-                var x = source.x + 20;
-                var y = source.y + 10;
-
-                this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0,
--500);
-                this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0,
-0);
-                this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0,
-500);
-
-                this.nextFire = this.game.time.time + this.fireRate;
-
-};
+    this.nextFire = this.game.time.time + this.fireRate;
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////
 //  Bullets have Gravity.y set on a repeating pre-calculated pattern //
 ///////////////////////////////////////////////////////////////////////
 
-Weapon.Pattern = function (game) {
+export class Pattern extends Weapon {
+  pattern: any[]
+  patternIndex: number
 
-                Phaser.Group.call(this, game, game.world, 'Pattern', false,
-true, Phaser.Physics.ARCADE);
+  constructor(game) {
+    super(game, 'Pattern');
 
-                this.nextFire = 0;
-                this.bulletSpeed = 600;
-                this.fireRate = 40;
+    this.nextFire = 0;
+    this.bulletSpeed = 600;
+    this.fireRate = 40;
 
-                this.pattern = Phaser.ArrayUtils.numberArrayStep(-800, 800,
-200);
-                this.pattern =
-this.pattern.concat(Phaser.ArrayUtils.numberArrayStep(800, -800, -200));
+    this.pattern = Phaser.ArrayUtils.numberArrayStep(-800, 800, 200);
+    this.pattern =
+        this.pattern.concat(Phaser.ArrayUtils.numberArrayStep(800, -800, -200));
 
-                this.patternIndex = 0;
+    this.patternIndex = 0;
 
-                for (var i = 0; i < 64; i++)
-                {
-                                this.add(new Bullet(game, 'bullet4'), true);
-                }
+    for (var i = 0; i < 64; i++) {
+      this.add(new Bullet(game, 'bullet4'), true);
+    }
 
-                return this;
+    return this;
+  }
 
-};
+  fire(source) {
+    if (this.game.time.time < this.nextFire) {
+      return;
+    }
 
-Weapon.Pattern.prototype = Object.create(Phaser.Group.prototype);
-Weapon.Pattern.prototype.constructor = Weapon.Pattern;
+    var x = source.x + 20;
+    var y = source.y + 10;
 
-Weapon.Pattern.prototype.fire = function (source) {
+    this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0,
+                                    this.pattern[this.patternIndex]);
 
-                if (this.game.time.time < this.nextFire) { return; }
+    this.patternIndex++;
 
-                var x = source.x + 20;
-                var y = source.y + 10;
+    if (this.patternIndex === this.pattern.length) {
+      this.patternIndex = 0;
+    }
 
-                this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0,
-this.pattern[this.patternIndex]);
-
-                this.patternIndex++;
-
-                if (this.patternIndex === this.pattern.length)
-                {
-                                this.patternIndex = 0;
-                }
-
-                this.nextFire = this.game.time.time + this.fireRate;
-
-};
+    this.nextFire = this.game.time.time + this.fireRate;
+  }
+}
 
 ///////////////////////////////////////////////////////////////////
 //  Rockets that visually track the direction they're heading in //
 ///////////////////////////////////////////////////////////////////
 
-Weapon.Rockets = function (game) {
+export class Rockets extends Weapon {
+  constructor(game) {
+    super(game, 'Rockets');
 
-                Phaser.Group.call(this, game, game.world, 'Rockets', false,
-true, Phaser.Physics.ARCADE);
+    this.nextFire = 0;
+    this.bulletSpeed = 400;
+    this.fireRate = 250;
 
-                this.nextFire = 0;
-                this.bulletSpeed = 400;
-                this.fireRate = 250;
+    for (var i = 0; i < 32; i++) {
+      this.add(new Bullet(game, 'bullet10'), true);
+    }
 
-                for (var i = 0; i < 32; i++)
-                {
-                                this.add(new Bullet(game, 'bullet10'), true);
-                }
+    this.setAll('tracking', true);
 
-                this.setAll('tracking', true);
+    return this;
+  }
 
-                return this;
+  fire(source) {
+    if (this.game.time.time < this.nextFire) {
+      return;
+    }
 
-};
+    var x = source.x + 10;
+    var y = source.y + 10;
 
-Weapon.Rockets.prototype = Object.create(Phaser.Group.prototype);
-Weapon.Rockets.prototype.constructor = Weapon.Rockets;
+    this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0, -700);
+    this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0, 700);
 
-Weapon.Rockets.prototype.fire = function (source) {
-
-                if (this.game.time.time < this.nextFire) { return; }
-
-                var x = source.x + 10;
-                var y = source.y + 10;
-
-                this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0,
--700);
-                this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0,
-700);
-
-                this.nextFire = this.game.time.time + this.fireRate;
-
-};
+    this.nextFire = this.game.time.time + this.fireRate;
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////
 //  A single bullet that scales in size as it moves across the screen //
 ////////////////////////////////////////////////////////////////////////
 
-Weapon.ScaleBullet = function (game) {
+export class ScaleBullet extends Weapon {
+  constructor(game) {
+    super(game, 'Scale Bullet');
 
-                Phaser.Group.call(this, game, game.world, 'Scale Bullet',
-false, true, Phaser.Physics.ARCADE);
+    this.nextFire = 0;
+    this.bulletSpeed = 800;
+    this.fireRate = 100;
 
-                this.nextFire = 0;
-                this.bulletSpeed = 800;
-                this.fireRate = 100;
+    for (var i = 0; i < 32; i++) {
+      this.add(new Bullet(game, 'bullet9'), true);
+    }
 
-                for (var i = 0; i < 32; i++)
-                {
-                                this.add(new Bullet(game, 'bullet9'), true);
-                }
+    this.setAll('scaleSpeed', 0.05);
+  }
 
-                this.setAll('scaleSpeed', 0.05);
+  fire(source) {
+    if (this.game.time.time < this.nextFire) {
+      return;
+    }
 
-                return this;
+    var x = source.x + 10;
+    var y = source.y + 10;
 
-};
+    this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0, 0);
 
-Weapon.ScaleBullet.prototype = Object.create(Phaser.Group.prototype);
-Weapon.ScaleBullet.prototype.constructor = Weapon.ScaleBullet;
-
-Weapon.ScaleBullet.prototype.fire = function (source) {
-
-                if (this.game.time.time < this.nextFire) { return; }
-
-                var x = source.x + 10;
-                var y = source.y + 10;
-
-                this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, 0,
-0);
-
-                this.nextFire = this.game.time.time + this.fireRate;
-
-};
+    this.nextFire = this.game.time.time + this.fireRate;
+  }
+}
 
 /////////////////////////////////////////////
 //  A Weapon Combo - Single Shot + Rockets //
 /////////////////////////////////////////////
 
-Weapon.Combo1 = function (game) {
+export class Combo1 {
+  name: string
+  weapon1: Weapon
+  weapon2: Weapon
 
-                this.name = "Combo One";
-                this.weapon1 = new Weapon.SingleBullet(game);
-                this.weapon2 = new Weapon.Rockets(game);
+  constructor(game) {
+    this.name = "Combo One";
+    this.weapon1 = new SingleBullet(game);
+    this.weapon2 = new Rockets(game);
+  }
 
-};
+  reset() {
+    this.weapon1.visible = false;
+    this.weapon1.callAll('reset', null, 0, 0);
+    this.weapon1.setAll('exists', false);
 
-Weapon.Combo1.prototype.reset = function () {
+    this.weapon2.visible = false;
+    this.weapon2.callAll('reset', null, 0, 0);
+    this.weapon2.setAll('exists', false);
+  }
 
-                this.weapon1.visible = false;
-                this.weapon1.callAll('reset', null, 0, 0);
-                this.weapon1.setAll('exists', false);
-
-                this.weapon2.visible = false;
-                this.weapon2.callAll('reset', null, 0, 0);
-                this.weapon2.setAll('exists', false);
-
-};
-
-Weapon.Combo1.prototype.fire = function (source) {
-
-                this.weapon1.fire(source);
-                this.weapon2.fire(source);
-
-};
+  fire(source) {
+    this.weapon1.fire(source);
+    this.weapon2.fire(source);
+  }
+}
 
 /////////////////////////////////////////////////////
 //  A Weapon Combo - ThreeWay, Pattern and Rockets //
 /////////////////////////////////////////////////////
 
-Weapon.Combo2 = function (game) {
+export class Combo2 {
+  name: string
+  weapon1: Weapon
+  weapon2: Weapon
+  weapon3: Weapon
 
-                this.name = "Combo Two";
-                this.weapon1 = new Weapon.Pattern(game);
-                this.weapon2 = new Weapon.ThreeWay(game);
-                this.weapon3 = new Weapon.Rockets(game);
+  constructor(game) {
+    this.name = "Combo Two";
+    this.weapon1 = new Pattern(game);
+    this.weapon2 = new ThreeWay(game);
+    this.weapon3 = new Rockets(game);
+  }
 
-};
+  reset() {
+    this.weapon1.visible = false;
+    this.weapon1.callAll('reset', null, 0, 0);
+    this.weapon1.setAll('exists', false);
 
-Weapon.Combo2.prototype.reset = function () {
+    this.weapon2.visible = false;
+    this.weapon2.callAll('reset', null, 0, 0);
+    this.weapon2.setAll('exists', false);
 
-                this.weapon1.visible = false;
-                this.weapon1.callAll('reset', null, 0, 0);
-                this.weapon1.setAll('exists', false);
+    this.weapon3.visible = false;
+    this.weapon3.callAll('reset', null, 0, 0);
+    this.weapon3.setAll('exists', false);
+  }
 
-                this.weapon2.visible = false;
-                this.weapon2.callAll('reset', null, 0, 0);
-                this.weapon2.setAll('exists', false);
-
-                this.weapon3.visible = false;
-                this.weapon3.callAll('reset', null, 0, 0);
-                this.weapon3.setAll('exists', false);
-
-};
-
-Weapon.Combo2.prototype.fire = function (source) {
-
-                this.weapon1.fire(source);
-                this.weapon2.fire(source);
-                this.weapon3.fire(source);
-
-};
-*/
+  fire(source) {
+    this.weapon1.fire(source);
+    this.weapon2.fire(source);
+    this.weapon3.fire(source);
+  }
+}
