@@ -1,5 +1,5 @@
 /// <reference path="../typings/browser.d.ts"/>
-/// <reference path="../lib/phaser.d.ts"/>
+/// <reference path="../public/lib/phaser.d.ts"/>
 import * as Phaser from 'phaser';
 import * as Weapon from './weapons.ts';
 
