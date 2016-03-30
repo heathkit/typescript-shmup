@@ -3,7 +3,6 @@
 This is a port to TypeScript of [this shmup demo](http://www.photonstorm.com/tags/shmup).
 
 ## TODO
-- clang formatting
 - publishing to github pages
 - unit testing
 
